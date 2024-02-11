@@ -1,23 +1,22 @@
-#Assignment 2 for CE235.
-#All updates are tracked to github and can be found here;
+# Assignment 2 for CE235.
+# All updates are tracked to github and can be found here;
 # https://github.com/I-Am-Fox/CE235-Assignment-2
 
-#******************************************************************************
+# ******************************************************************************
 #
 #                            est_extract_secret_text.py
 #
 # Extracts a secret text from within an image file.
 #
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #
 # First, open an image file and get the bytes of the image. Second, given the
 # values of p and q, extract the hidden bits of the text message from the
 # image. Third, put the bits together into the bytes of the hidden
-#text. Fourth, write out the hidden text to a file.
+# text. Fourth, write out the hidden text to a file.
 
 def est_extract():
-
     image_byte_array = est_get_bytes_containing_message()
 
     # header_len is always fixed at 54
@@ -28,65 +27,66 @@ def est_extract():
     p = 1
     q = 1
 
-    correct_p, correct_q = 1,1
+    correct_p, correct_q = 1, 1
+    best_proportion = 1.0
 
     # Loop through possible values for p and q
     for p in range(1, 4):
         for q in range(1, 4):
+            message_bit_array = est_extract_bits_from_image(image_byte_array, header_len, p, q)
 
-            proportion = 0.0
+            total_bits = len(message_bit_array) * 8
+            ones_count = sum(bin(byte).count('1') for byte in message_bit_array)
+            proportion = ones_count / total_bits
 
             # Print the current combination and its proportion
             print(f"p={p} q={q} bp={proportion:.3f}")
 
             # Check if this is the correct combination
-            if proportion < 0.5:
+            if 0.5 > proportion > best_proportion:
+                best_proportion = proportion
                 correct_p, correct_q = p, q
 
     # Print the correct combination of p and q
     print(f"The answer is: p={correct_p} q={correct_q}")
 
-
-
-
-
     message_bit_array = est_extract_bits_from_image(
-        image_byte_array, header_len, p, q )
-    message_byte_array = est_convert_bits_to_bytes( message_bit_array )
-    est_write_message_text( message_byte_array )
+        image_byte_array, header_len, p, q)
+    message_byte_array = est_convert_bits_to_bytes(message_bit_array)
+    est_write_message_text(message_byte_array)
 
-#------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 #
 # Open a bmp file which is an image in which is hidden a secret text. Return a
 # byte array containing the bytes of the image.
 
 def est_get_bytes_containing_message():
-
     # Open file as bytes not characters
-    file = open( "flower_with_text.bmp", "rb" )
+    file = open("flower_with_text.bmp", "rb")
 
     # Create a byte array of the file. Each element of the array corresponds to
     # one byte and is is a number 0-255.
-    data = bytearray( file.read() )
+    data = bytearray(file.read())
     file.close()
 
     return data
 
-#------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 #
 # The three arguments are data, a byte array containing the bytes of the image,
 # header_len which is the size of the header in the image file, and the secret
 # values p and q which are integers and which determine the
 # encryption/decryption of the message within the image file.
 
-def est_extract_bits_from_image( data, header_len, p, q ):
-
+def est_extract_bits_from_image(data, header_len, p, q):
     # Create a byte array in which to place the bits of the hidden text. Later
     # we will convert these to bytes. The argument to byte array is simply the
     # required size which we are computing from the length of the image file,
     # header_len (always 54) and the values of p and q (which we have to
     # determine.
-    text_as_bits = bytearray( ( len( data ) - header_len - p ) // q )
+    text_as_bits = bytearray((len(data) - header_len - p) // q)
 
     # Copy the bits of the text into text_as_bits. Remember, we start at
     # position header_len + p in data, according to the encryption
@@ -99,23 +99,23 @@ def est_extract_bits_from_image( data, header_len, p, q ):
     # 0, otherwise. In other words, we have extracted the least significant bit
     # by this means.
 
-    for i in range( 0, len( text_as_bits ) ):
-        text_as_bits[ i ] = data[ header_len + p + i * q ] & 0b00000001
+    for i in range(0, len(text_as_bits)):
+        text_as_bits[i] = data[header_len + p + i * q] & 0b00000001
 
     return text_as_bits
 
-#------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 #
 # Argument text_as_bits is a byte array containing the bits of the message. We
 # convert these to the equivalent bytes and then return a byte array containing
 # them .
 
-def est_convert_bits_to_bytes( text_as_bits ):
-
+def est_convert_bits_to_bytes(text_as_bits):
     # Create a byte array for the output text. The length of it is eight times
     # less than the length of text_as_bits, because one byte equals eight bits.
 
-    text = bytearray( len( text_as_bits ) // 8 )
+    text = bytearray(len(text_as_bits) // 8)
 
     # Extract the bits from text_as_bits, assemble as bytes and place the bytes
     # in text.
@@ -136,34 +136,34 @@ def est_convert_bits_to_bytes( text_as_bits ):
     # individual bits (taken from the image file). We then move on to the next
     # byte and so on.
 
-    for i in range( 0, len( text ) ):
-        text[ i ] = 0
-        for j in range( 0, 8 ):
-            text[ i ] = text[ i ] | ( text_as_bits[ i * 8 + j ] << j )
+    for i in range(0, len(text)):
+        text[i] = 0
+        for j in range(0, 8):
+            text[i] = text[i] | (text_as_bits[i * 8 + j] << j)
 
     return text
 
-#------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 #
 # Argument text is a byte array containing the output text. Writes this to a
 # file.
 
-def est_write_message_text( text ):
-
+def est_write_message_text(text):
     # Now we have all the bytes of the hidden text in text. The final step is
     # to write them to the output file. Note that we open the output file as a
     # binary file.
 
-    file = open("hidden_text_we_found.txt","wb")
+    file = open("hidden_text_we_found.txt", "wb")
     file.write(text)
     file.close()
 
-#------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 #
 # Allow the program to be run from the command line:
 #
 # python est_extract_secret_text
 
 if __name__ == '__main__':
-
     est_extract()
