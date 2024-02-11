@@ -1,3 +1,7 @@
+#Assignment 2 for CE235.
+#All updates are tracked to github and can be found here;
+# https://github.com/I-Am-Fox/CE235-Assignment-2
+
 #******************************************************************************
 #
 #                            est_extract_secret_text.py
@@ -24,9 +28,14 @@ def est_extract():
     p = 1
     q = 1
 
-    # ********************************************************
-    # ADD CODE HERE WHICH FINDS THE CORRECT VALUES OF p and q.
-    # ********************************************************
+    #Loop through the variables for p and q
+    for p in range(1, 4):
+        for q in range(1, 4):
+            message_bit_array = est_get_bytes_containing_message(p, q)
+
+
+
+
 
     message_bit_array = est_extract_bits_from_image(
         image_byte_array, header_len, p, q )
