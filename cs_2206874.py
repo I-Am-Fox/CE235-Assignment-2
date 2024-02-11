@@ -1,7 +1,3 @@
-# Assignment 2 for CE235.
-# All updates are tracked to github and can be found here;
-# https://github.com/I-Am-Fox/CE235-Assignment-2
-
 # ******************************************************************************
 #
 #                            est_extract_secret_text.py
@@ -16,42 +12,48 @@
 # image. Third, put the bits together into the bytes of the hidden
 # text. Fourth, write out the hidden text to a file.
 
+
+# Function to calculate the proportion of ones in the message as per the specification
+def est_bit_proportion(byte_array):
+    total_bits = len(byte_array) * 8
+    ones_count = sum(bin(byte).count('1') for byte in byte_array)
+    proportion = ones_count / total_bits
+    return proportion
+
+
 def est_extract():
     image_byte_array = est_get_bytes_containing_message()
 
-    # header_len is always fixed at 54
     header_len = 54
 
-    # Set the values of p and q for the extraction. We do not yet know what
-    # values to use
     p = 1
     q = 1
 
+    # Sets the correct values of p and q to 1
     correct_p, correct_q = 1, 1
+
+    # Sets the best proportion to 1.0
     best_proportion = 1.0
 
-    # Loop through possible values for p and q
     for p in range(1, 4):
         for q in range(1, 4):
+            # Calls the est_extract_bits_from_image function to extract the bits from the image
             message_bit_array = est_extract_bits_from_image(image_byte_array, header_len, p, q)
+            proportion = est_bit_proportion(message_bit_array)
 
-            total_bits = len(message_bit_array) * 8
-            ones_count = sum(bin(byte).count('1') for byte in message_bit_array)
-            proportion = ones_count / total_bits
-
-            # Print the current combination and its proportion
+            # Print the values of p and q to the command line along with the proprtion
             print(f"p={p} q={q} bp={proportion:.3f}")
 
-            # Check if this is the correct combination
-            if 0.5 > proportion > best_proportion:
+            # Check to see if the proportion of ones in the message is less than the best proportion
+            if proportion < 0.5 and proportion < best_proportion:
                 best_proportion = proportion
                 correct_p, correct_q = p, q
 
-    # Print the correct combination of p and q
+    # Print the correct values of p and q to the command line
     print(f"The answer is: p={correct_p} q={correct_q}")
 
     message_bit_array = est_extract_bits_from_image(
-        image_byte_array, header_len, p, q)
+        image_byte_array, header_len, correct_p, correct_q)
     message_byte_array = est_convert_bits_to_bytes(message_bit_array)
     est_write_message_text(message_byte_array)
 
