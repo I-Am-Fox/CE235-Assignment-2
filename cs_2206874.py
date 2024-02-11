@@ -33,6 +33,16 @@ def est_extract():
         for q in range(1, 4):
             message_bit_array = est_get_bytes_containing_message(p, q)
 
+            #Calculate the protportion of 1 bits
+            total_bits = len(message_bit_array) * 8
+            one_bits = sum(bin(byte).count('1') for byte in message_bit_array)
+            proportion = one_bits / total_bits
+
+            #Print the current combination and its proportion
+            print(f"p={p} q={q} bp={proportion:.3f}")
+
+            
+
 
 
 
