@@ -28,6 +28,8 @@ def est_extract():
     p = 1
     q = 1
 
+    correct_p, correct_q = 1,1
+
     #Loop through the variables for p and q
     for p in range(1, 4):
         for q in range(1, 4):
@@ -41,7 +43,8 @@ def est_extract():
             #Print the current combination and its proportion
             print(f"p={p} q={q} bp={proportion:.3f}")
 
-            
+            if proportion > 0.5:
+                correct_p, correct_q = p, q
 
 
 
