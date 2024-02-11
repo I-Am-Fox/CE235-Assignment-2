@@ -1,3 +1,7 @@
+# Assignment 2 for CE235.
+# All updates are tracked to github and can be found here;
+# https://github.com/I-Am-Fox/CE235-Assignment-2
+
 # ******************************************************************************
 #
 #                            est_extract_secret_text.py
